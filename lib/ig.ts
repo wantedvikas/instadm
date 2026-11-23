@@ -23,6 +23,16 @@ export async function getInstagramAccount() {
 export const subscribeWebhooks = (igId: string) =>
   call(`/${igId}/subscribed_apps?subscribed_fields=comments,messages,messaging_postbacks`, { method: "POST" });
 
+/** Permissions granted to IG_ACCESS_TOKEN (for the dashboard status line). Needs the Meta app ID + secret. */
+export async function tokenScopes() {
+  const appToken = `1177254798157533|${process.env.META_APP_SECRET}`;
+  const res = await fetch(
+    `${GRAPH}/debug_token?input_token=${encodeURIComponent(token())}&access_token=${encodeURIComponent(appToken)}`,
+  );
+  const body = await res.json().catch(() => ({}));
+  return (body.data?.scopes as string[] | undefined) ?? [`unknown (${body.error?.message ?? res.status})`];
+}
+
 /** Which webhook fields Meta actually has on for this account (for the dashboard status line). */
 export const subscribedFields = async (igId: string) =>
   (await call<{ data: { subscribed_fields?: string[] }[] }>(`/${igId}/subscribed_apps`)).data.flatMap(
