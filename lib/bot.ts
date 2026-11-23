@@ -52,7 +52,8 @@ async function onComment(account: Account, v: CommentValue) {
 async function onMessage(account: Account, e: MessagingEvent) {
   const sender = e.sender?.id;
   const mid = e.message?.mid ?? e.postback?.mid;
-  if (!sender || sender === account.igId || e.message?.is_echo || !mid) return; // our own outgoing messages
+  if (e.message?.is_echo || sender === account.igId) return; // our own outgoing messages
+  if (!sender || !mid) return console.log("Message skipped: missing sender or message id");
   if (!(await firstTime(`m:${mid}`))) return console.log("Message skipped: already handled");
 
   const payload = e.message?.quick_reply?.payload ?? e.postback?.payload ?? "";
