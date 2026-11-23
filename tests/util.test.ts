@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { matchesKeyword, readSigned, signValue, verifySignature } from "../lib/util.ts";
+import { firstDm, matchesKeyword, readSigned, signValue, verifySignature } from "../lib/util.ts";
 
 test("keywords", () => {
   assert.ok(matchesKeyword("anything", ""));
@@ -27,4 +27,11 @@ test("signed session", () => {
   assert.equal(readSigned(v, "other"), null);
   assert.equal(readSigned("12345.deadbeef", "secret"), null);
   assert.equal(readSigned(undefined, "secret"), null);
+});
+
+test("first DM", () => {
+  const rule = { replyText: "Hey {username}!", linkMessage: "https://x.dev", followGate: false };
+  assert.deepEqual(firstDm(rule, "sam"), { text: "Hey sam!\n\nhttps://x.dev", withButton: false });
+  assert.deepEqual(firstDm({ ...rule, followGate: true }, "sam"), { text: "Hey sam!", withButton: true });
+  assert.equal(firstDm({ ...rule, replyText: "" }, "sam").text, "https://x.dev");
 });

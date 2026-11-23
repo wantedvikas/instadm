@@ -22,7 +22,7 @@ export function RuleForm({ mediaId, rule }: { mediaId: string; rule: Rule }) {
       </label>
 
       <label>
-        First DM <span className="hint">{"{username}"} is replaced; a &quot;Send me the link&quot; button is added</span>
+        First DM <span className="hint">{"{username}"} is replaced; the link is added below it (or a &quot;Send me the link&quot; button when followers-only is on)</span>
         <textarea name="replyText" rows={2} defaultValue={rule.replyText} />
       </label>
 

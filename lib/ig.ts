@@ -91,6 +91,9 @@ function sendMessage(_igId: string, recipient: object, text: string, quickReplie
 export const sendDM = (igId: string, igsid: string, text: string, quickReplies?: QuickReply[]) =>
   sendMessage(igId, { id: igsid }, text, quickReplies);
 
+export const sendPrivateText = (igId: string, commentId: string, text: string) =>
+  sendMessage(igId, { comment_id: commentId }, text);
+
 /** The one allowed DM in reply to a comment. Meta documents text only, so try with a button and fall back to plain text. */
 export async function sendPrivateReply(igId: string, commentId: string, text: string, button: QuickReply) {
   try {

@@ -8,9 +8,9 @@ import { getAccount, getRules, type Rule } from "@/lib/store";
 const DEFAULT_RULE: Rule = {
   enabled: false,
   keywords: "",
-  replyText: "Hey {username}! Thanks for the comment 🙌 Tap the button below and I'll send it over.",
+  replyText: "Hey {username}! Thanks for the comment 🙌 Here's what I promised:",
   linkMessage: "",
-  followGate: true,
+  followGate: false,
   followText: "Almost there! Please follow me first, then tap “I followed ✅” and I'll send the link 🙏",
 };
 

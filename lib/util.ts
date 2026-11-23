@@ -23,6 +23,19 @@ export function matchesKeyword(text: string, keywords: string) {
   return list.some((k) => (k.includes(" ") ? text.toLowerCase().includes(k) : words.includes(k)));
 }
 
+/**
+ * The one DM Instagram lets us send in reply to a comment.
+ * Without the follow gate it carries the link itself, so no reply/webhook round-trip is needed.
+ */
+export function firstDm(
+  rule: { replyText: string; linkMessage: string; followGate: boolean },
+  username: string,
+) {
+  const greeting = rule.replyText.replaceAll("{username}", username).trim();
+  if (rule.followGate) return { text: greeting, withButton: true };
+  return { text: [greeting, rule.linkMessage.trim()].filter(Boolean).join("\n\n").slice(0, 1000), withButton: false };
+}
+
 /** Signed session value: "<igId>.<hmac>". */
 export function signValue(value: string, secret: string) {
   return value + "." + createHmac("sha256", secret).update(value).digest("hex");

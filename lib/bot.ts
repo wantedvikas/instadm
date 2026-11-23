@@ -1,6 +1,6 @@
-import { followsMe, sendDM, sendPrivateReply } from "./ig";
+import { followsMe, sendDM, sendPrivateReply, sendPrivateText } from "./ig";
 import { clearPending, firstTime, getAccount, getPending, getRule, setPending, type Account } from "./store";
-import { matchesKeyword } from "./util";
+import { firstDm, matchesKeyword } from "./util";
 
 // Quick-reply titles are cut at 20 characters.
 const linkButton = (mediaId: string) => ({ content_type: "text" as const, title: "Send me the link", payload: `GET:${mediaId}` });
@@ -38,10 +38,14 @@ async function onComment(account: Account, v: CommentValue) {
   if (!matchesKeyword(v.text ?? "", rule.keywords)) return console.log("Comment skipped: no keyword match");
   if (!(await firstTime(`c:${commentId}`))) return console.log("Comment skipped: already handled");
 
+  const dm = firstDm(rule, v.from?.username ?? "there");
+  if (!dm.withButton) {
+    await sendPrivateText(account.igId, commentId, dm.text);
+    return console.log(`Link sent directly for comment ${commentId}`);
+  }
   await setPending(from, mediaId);
-  const text = rule.replyText.replaceAll("{username}", v.from?.username ?? "there");
-  await sendPrivateReply(account.igId, commentId, text, linkButton(mediaId));
-  console.log(`Private reply sent for comment ${commentId}`);
+  await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
+  console.log(`Private reply with button sent for comment ${commentId}`);
 }
 
 /** Step 2: they tap a button (or type anything) -> follow check -> link or "follow first". */
