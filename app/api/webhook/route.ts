@@ -14,9 +14,15 @@ export async function POST(req: Request) {
   const raw = await req.text();
   // Signed with the Meta app secret (App settings > Basic).
   if (!verifySignature(raw, req.headers.get("x-hub-signature-256"), [process.env.META_APP_SECRET])) {
+    console.warn("Webhook rejected: bad signature", {
+      hasHeader: !!req.headers.get("x-hub-signature-256"),
+      secretLength: process.env.META_APP_SECRET?.length ?? 0,
+    });
     return new Response("Bad signature", { status: 401 });
   }
+  const body = JSON.parse(raw);
+  console.log("Webhook received", body.object, raw.length, "bytes");
   // Work finishes before we respond: serverless functions stop once the response is sent.
-  await handleWebhook(JSON.parse(raw));
+  await handleWebhook(body);
   return new Response("OK", { status: 200 });
 }
