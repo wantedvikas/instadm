@@ -23,6 +23,12 @@ export async function getInstagramAccount() {
 export const subscribeWebhooks = (igId: string) =>
   call(`/${igId}/subscribed_apps?subscribed_fields=comments,messages,messaging_postbacks`, { method: "POST" });
 
+/** Which webhook fields Meta actually has on for this account (for the dashboard status line). */
+export const subscribedFields = async (igId: string) =>
+  (await call<{ data: { subscribed_fields?: string[] }[] }>(`/${igId}/subscribed_apps`)).data.flatMap(
+    (a) => a.subscribed_fields ?? [],
+  );
+
 export type Media = {
   id: string;
   media_type: string;

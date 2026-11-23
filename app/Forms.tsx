@@ -23,7 +23,7 @@ export function ConnectButton({ label }: { label: string }) {
     <form action={action} className="row">
       <button disabled={pending}>{pending ? "Connecting…" : label}</button>
       <span role="status" className={state.error ? "err" : "ok"}>
-        {state.error ?? (state.ok ? "Connected ✓" : "")}
+        {state.error ?? (state.ok ? `Connected ✓ ${state.info ?? ""}` : "")}
       </span>
     </form>
   );

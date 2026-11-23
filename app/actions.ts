@@ -3,7 +3,7 @@
 import { timingSafeEqual, createHash } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getInstagramAccount, subscribeWebhooks } from "@/lib/ig";
+import { getInstagramAccount, subscribeWebhooks, subscribedFields } from "@/lib/ig";
 import { clearSession, isLoggedIn, setSession } from "@/lib/session";
 import { setAccount, setRule } from "@/lib/store";
 
@@ -11,7 +11,7 @@ import { setAccount, setRule } from "@/lib/store";
 const text = (f: FormData, key: string, max = 1000) => String(f.get(key) ?? "").trim().slice(0, max);
 const hash = (s: string) => createHash("sha256").update(s).digest();
 
-export type FormState = { ok?: boolean; error?: string; at?: number };
+export type FormState = { ok?: boolean; error?: string; at?: number; info?: string };
 
 export async function login(_prev: FormState, f: FormData): Promise<FormState> {
   const expected = process.env.DASHBOARD_PASSWORD;
@@ -25,16 +25,18 @@ export async function login(_prev: FormState, f: FormData): Promise<FormState> {
 /** Reads the IG account behind IG_ACCESS_TOKEN and subscribes it to webhooks. Safe to run again after changing the token. */
 export async function connect(): Promise<FormState> {
   if (!(await isLoggedIn())) return { error: "Session expired, log in again" };
+  let info = "";
   try {
     const account = await getInstagramAccount();
     await subscribeWebhooks(account.igId);
     await setAccount(account);
+    info = `Webhooks on: ${(await subscribedFields(account.igId)).join(", ") || "none"}`;
   } catch (e) {
     console.error("Connect failed:", e);
     return { error: e instanceof Error ? e.message : "Could not reach Instagram" };
   }
   revalidatePath("/");
-  return { ok: true, at: Date.now() };
+  return { ok: true, at: Date.now(), info };
 }
 
 export async function saveRule(_prev: FormState, f: FormData): Promise<FormState> {
