@@ -1,8 +1,9 @@
 import { logout } from "./actions";
+import { ConnectButton, LoginForm } from "./Forms";
 import { RuleForm } from "./RuleForm";
 import { listVideos, type Media } from "@/lib/ig";
-import { currentAccount } from "@/lib/session";
-import { getRules, type Rule } from "@/lib/store";
+import { isLoggedIn } from "@/lib/session";
+import { getAccount, getRules, type Rule } from "@/lib/store";
 
 const DEFAULT_RULE: Rule = {
   enabled: false,
@@ -13,19 +14,24 @@ const DEFAULT_RULE: Rule = {
   followText: "Almost there! Please follow me first, then tap “I followed ✅” and I'll send the link 🙏",
 };
 
-export default async function Home({ searchParams }: PageProps<"/">) {
-  const { error } = await searchParams;
-  const account = await currentAccount();
-
-  if (!account) {
+export default async function Home() {
+  if (!(await isLoggedIn())) {
     return (
       <main className="center">
         <h1>InstaAutoDM</h1>
         <p>Auto-DM your promised links to people who comment on your reels.</p>
-        {typeof error === "string" && <p className="err">{error}</p>}
-        <a className="button" href="/api/auth/login">
-          Connect Instagram
-        </a>
+        <LoginForm />
+      </main>
+    );
+  }
+
+  const account = await getAccount();
+  if (!account) {
+    return (
+      <main className="center">
+        <h1>InstaAutoDM</h1>
+        <p>Connect the Instagram account behind IG_ACCESS_TOKEN and subscribe it to webhooks.</p>
+        <ConnectButton label="Connect Instagram" />
       </main>
     );
   }
@@ -33,10 +39,10 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   let videos: Media[] = [];
   let loadError = "";
   try {
-    videos = await listVideos(account.token);
+    videos = await listVideos(account.igId);
   } catch (e) {
     console.error(e);
-    loadError = "Could not load your videos. Try reconnecting Instagram.";
+    loadError = "Could not load your videos. Check IG_ACCESS_TOKEN, then reconnect.";
   }
   const rules = await getRules();
 
@@ -45,16 +51,13 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <header>
         <h1>InstaAutoDM</h1>
         <span>@{account.username}</span>
+        <ConnectButton label="Reconnect" />
         <form action={logout}>
           <button className="link">Log out</button>
         </form>
       </header>
 
-      {loadError && (
-        <p className="err">
-          {loadError} <a href="/api/auth/login">Reconnect</a>
-        </p>
-      )}
+      {loadError && <p className="err">{loadError}</p>}
       {!loadError && videos.length === 0 && <p>No videos found on this account.</p>}
 
       <div className="grid">

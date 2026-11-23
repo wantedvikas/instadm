@@ -38,7 +38,7 @@ async function onComment(account: Account, v: CommentValue) {
 
   await setPending(from, mediaId);
   const text = rule.replyText.replaceAll("{username}", v.from?.username ?? "there");
-  await sendPrivateReply(account.token, commentId, text, linkButton(mediaId));
+  await sendPrivateReply(account.igId, commentId, text, linkButton(mediaId));
 }
 
 /** Step 2: they tap a button (or type anything) -> follow check -> link or "follow first". */
@@ -58,25 +58,25 @@ async function onMessage(account: Account, e: MessagingEvent) {
   if (rule.followGate) {
     let follows = true;
     try {
-      follows = await followsMe(account.token, sender);
+      follows = await followsMe(sender);
     } catch (err) {
       // Fail open: a broken lookup should not trap people in a "follow first" loop.
       console.error("Follow check failed, sending link anyway:", err);
     }
     if (!follows) {
-      await sendDM(account.token, sender, rule.followText, [followedButton(mediaId)]);
+      await sendDM(account.igId, sender, rule.followText, [followedButton(mediaId)]);
       return;
     }
   }
 
-  await sendDM(account.token, sender, rule.linkMessage);
+  await sendDM(account.igId, sender, rule.linkMessage);
   await clearPending(sender);
 }
 
 export async function handleWebhook(body: WebhookBody) {
   if (body.object !== "instagram") return;
   const account = await getAccount();
-  if (!account) return;
+  if (!account || !process.env.IG_ACCESS_TOKEN) return;
 
   for (const entry of body.entry ?? []) {
     for (const change of entry.changes ?? []) {

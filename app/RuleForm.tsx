@@ -1,11 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { saveRule, type SaveState } from "./actions";
+import { saveRule, type FormState } from "./actions";
 import type { Rule } from "@/lib/store";
 
 export function RuleForm({ mediaId, rule }: { mediaId: string; rule: Rule }) {
-  const [state, action, pending] = useActionState<SaveState, FormData>(saveRule, {});
+  const [state, action, pending] = useActionState<FormState, FormData>(saveRule, {});
 
   return (
     <form action={action} className="rule">

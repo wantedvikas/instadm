@@ -8,7 +8,7 @@ const redis = new Redis({
 
 const WEEK = 7 * 24 * 60 * 60;
 
-export type Account = { igId: string; username: string; token: string; tokenSetAt: number };
+export type Account = { igId: string; username: string };
 
 export type Rule = {
   enabled: boolean;

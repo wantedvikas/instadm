@@ -12,8 +12,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const raw = await req.text();
-  // Instagram Login apps sign with the Instagram app secret; Meta app secret accepted too in case Meta signs with that.
-  if (!verifySignature(raw, req.headers.get("x-hub-signature-256"), [process.env.IG_APP_SECRET, process.env.META_APP_SECRET])) {
+  // Signed with the Meta app secret (App settings > Basic).
+  if (!verifySignature(raw, req.headers.get("x-hub-signature-256"), [process.env.META_APP_SECRET])) {
     return new Response("Bad signature", { status: 401 });
   }
   // Work finishes before we respond: serverless functions stop once the response is sent.

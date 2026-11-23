@@ -75,3 +75,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .row { display: flex; align-items: center; gap: 12px; }
 .ok { color: var(--ok); font-size: 13px; }
 .err { color: var(--err); }
+.login { display: flex; flex-direction: column; gap: 12px; width: min(320px, 100%); text-align: left; }
+.login label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 13px; }
+input[type="password"] { font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+header .row { margin-right: 8px; }
