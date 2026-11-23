@@ -55,6 +55,8 @@ export async function saveRule(_prev: FormState, f: FormData): Promise<FormState
   if (rule.enabled && rule.followGate && !rule.followText) return { error: "Fill in the follow-first message" };
 
   await setRule(mediaId, rule);
+  // React resets <form action> fields after submit; re-rendering with the saved rule makes the reset show the new values.
+  revalidatePath("/");
   return { ok: true, at: Date.now() };
 }
 
