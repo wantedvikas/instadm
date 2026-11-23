@@ -25,30 +25,6 @@ export async function getInstagramAccount() {
 export const subscribeWebhooks = () =>
   call("/me/subscribed_apps?subscribed_fields=messages,messaging_postbacks,feed", { method: "POST" });
 
-/** Which webhook fields the Page has on for this app (for the dashboard status line). */
-export const subscribedFields = async () =>
-  (await call<{ data: { subscribed_fields?: string[] }[] }>("/me/subscribed_apps")).data.flatMap(
-    (a) => a.subscribed_fields ?? [],
-  );
-
-/** Latest Instagram DM threads the API can see (diagnostic: proves message access apart from webhooks). */
-export async function recentThreads() {
-  const r = await call<{ data: { updated_time: string; participants?: { data: { username?: string }[] } }[] }>(
-    "/me/conversations?platform=instagram&fields=updated_time,participants&limit=3",
-  );
-  return r.data.map((c) => `${c.participants?.data.map((p) => p.username).join("+")} @ ${c.updated_time}`);
-}
-
-/** Permissions granted to IG_ACCESS_TOKEN (for the dashboard status line). Needs the Meta app ID + secret. */
-export async function tokenScopes() {
-  const appToken = `1177254798157533|${process.env.META_APP_SECRET}`;
-  const res = await fetch(
-    `${GRAPH}/debug_token?input_token=${encodeURIComponent(token())}&access_token=${encodeURIComponent(appToken)}`,
-  );
-  const body = await res.json().catch(() => ({}));
-  return (body.data?.scopes as string[] | undefined) ?? [`unknown (${body.error?.message ?? res.status})`];
-}
-
 export type Media = {
   id: string;
   media_type: string;

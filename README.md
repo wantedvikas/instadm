@@ -49,7 +49,7 @@ The app uses Meta's **Instagram API with Facebook Login**, which works through t
 ### 4. Vercel
 1. Import the repo, and add **Upstash Redis** from the Marketplace. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN` for you.
 2. Set the rest of the variables from `.env.example`, then deploy.
-3. Log in with `DASHBOARD_PASSWORD` and click **Connect Instagram**. This subscribes the Page to DM webhooks. **Reconnect** shows the active webhook fields, the token's permissions and recent DM threads.
+3. Log in with `DASHBOARD_PASSWORD` and click **Connect Instagram**. This subscribes the Page to DM webhooks.
 
 ### 5. Going live for real followers
 In Development mode, only accounts linked to someone with a role on the app get DMs. To reach everyone:
