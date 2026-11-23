@@ -28,9 +28,9 @@ export async function connect(): Promise<FormState> {
   let info = "";
   try {
     const account = await getInstagramAccount();
-    await subscribeWebhooks(account.igId);
+    await subscribeWebhooks();
     await setAccount(account);
-    info = `Webhooks on: ${(await subscribedFields(account.igId)).join(", ") || "none"} · Token permissions: ${(await tokenScopes()).join(", ")}`;
+    info = `Webhooks on: ${(await subscribedFields()).join(", ") || "none"} · Token permissions: ${(await tokenScopes()).join(", ")}`;
   } catch (e) {
     console.error("Connect failed:", e);
     return { error: e instanceof Error ? e.message : "Could not reach Instagram" };

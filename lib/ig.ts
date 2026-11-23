@@ -1,4 +1,5 @@
-// Instagram API with Unified Login: graph.facebook.com + a system-user token generated in the Meta App Dashboard.
+// Instagram API with Facebook Login: graph.facebook.com + a Page access token for the Page linked to the IG account.
+// With a Page token, /me is the Page; DMs and webhook subscriptions go through it.
 const GRAPH = "https://graph.facebook.com/v27.0";
 
 const token = () => process.env.IG_ACCESS_TOKEN!;
@@ -11,17 +12,24 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-/** With a system-user token, /me is the integration user; the IG account comes from assigned_instagram_accounts. */
 export async function getInstagramAccount() {
-  const r = await call<{ data: { id: string; username: string }[] }>("/me/assigned_instagram_accounts?fields=id,username");
-  // shortcut: uses the first assigned account; add a picker if the token ever covers several accounts.
-  const a = r.data[0];
-  if (!a) throw new Error("This token has no Instagram account assigned");
-  return { igId: a.id, username: a.username };
+  const r = await call<{ id: string; instagram_business_account?: { id: string; username: string } }>(
+    "/me?fields=id,instagram_business_account{id,username}",
+  );
+  const ig = r.instagram_business_account;
+  if (!ig) throw new Error("IG_ACCESS_TOKEN must be a Page token for a Page linked to your Instagram account");
+  return { igId: ig.id, username: ig.username };
 }
 
-export const subscribeWebhooks = (igId: string) =>
-  call(`/${igId}/subscribed_apps?subscribed_fields=comments,messages,messaging_postbacks`, { method: "POST" });
+// The Page subscription is what makes Meta deliver Instagram DM webhooks for its linked account.
+export const subscribeWebhooks = () =>
+  call("/me/subscribed_apps?subscribed_fields=messages,messaging_postbacks,feed", { method: "POST" });
+
+/** Which webhook fields the Page has on for this app (for the dashboard status line). */
+export const subscribedFields = async () =>
+  (await call<{ data: { subscribed_fields?: string[] }[] }>("/me/subscribed_apps")).data.flatMap(
+    (a) => a.subscribed_fields ?? [],
+  );
 
 /** Permissions granted to IG_ACCESS_TOKEN (for the dashboard status line). Needs the Meta app ID + secret. */
 export async function tokenScopes() {
@@ -32,12 +40,6 @@ export async function tokenScopes() {
   const body = await res.json().catch(() => ({}));
   return (body.data?.scopes as string[] | undefined) ?? [`unknown (${body.error?.message ?? res.status})`];
 }
-
-/** Which webhook fields Meta actually has on for this account (for the dashboard status line). */
-export const subscribedFields = async (igId: string) =>
-  (await call<{ data: { subscribed_fields?: string[] }[] }>(`/${igId}/subscribed_apps`)).data.flatMap(
-    (a) => a.subscribed_fields ?? [],
-  );
 
 export type Media = {
   id: string;
@@ -69,8 +71,9 @@ export async function listVideos(igId: string) {
 
 type QuickReply = { content_type: "text"; title: string; payload: string };
 
-function sendMessage(igId: string, recipient: object, text: string, quickReplies?: QuickReply[]) {
-  return call(`/${igId}/messages`, {
+// igId is kept for logging/compat; the Page token sends as the Page-linked Instagram account.
+function sendMessage(_igId: string, recipient: object, text: string, quickReplies?: QuickReply[]) {
+  return call("/me/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ recipient, message: quickReplies ? { text, quick_replies: quickReplies } : { text } }),
