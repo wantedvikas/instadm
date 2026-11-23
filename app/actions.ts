@@ -3,7 +3,7 @@
 import { timingSafeEqual, createHash } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getInstagramAccount, subscribeWebhooks, subscribedFields, tokenScopes } from "@/lib/ig";
+import { getInstagramAccount, recentThreads, subscribeWebhooks, subscribedFields, tokenScopes } from "@/lib/ig";
 import { clearSession, isLoggedIn, setSession } from "@/lib/session";
 import { setAccount, setRule } from "@/lib/store";
 
@@ -31,6 +31,7 @@ export async function connect(): Promise<FormState> {
     await subscribeWebhooks();
     await setAccount(account);
     info = `Webhooks on: ${(await subscribedFields()).join(", ") || "none"} · Token permissions: ${(await tokenScopes()).join(", ")}`;
+    info += ` · Recent DM threads: ${await recentThreads().then((t) => t.join(" | ") || "none", (e) => `error: ${e instanceof Error ? e.message : e}`)}`;
   } catch (e) {
     console.error("Connect failed:", e);
     return { error: e instanceof Error ? e.message : "Could not reach Instagram" };

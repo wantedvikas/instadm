@@ -31,6 +31,14 @@ export const subscribedFields = async () =>
     (a) => a.subscribed_fields ?? [],
   );
 
+/** Latest Instagram DM threads the API can see (diagnostic: proves message access apart from webhooks). */
+export async function recentThreads() {
+  const r = await call<{ data: { updated_time: string; participants?: { data: { username?: string }[] } }[] }>(
+    "/me/conversations?platform=instagram&fields=updated_time,participants&limit=3",
+  );
+  return r.data.map((c) => `${c.participants?.data.map((p) => p.username).join("+")} @ ${c.updated_time}`);
+}
+
 /** Permissions granted to IG_ACCESS_TOKEN (for the dashboard status line). Needs the Meta app ID + secret. */
 export async function tokenScopes() {
   const appToken = `1177254798157533|${process.env.META_APP_SECRET}`;
