@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logout } from "../actions";
 import { ConnectButton } from "../Forms";
+import { Icon } from "../icons";
 import { Nav } from "../Nav";
 import { isLoggedIn } from "@/lib/session";
 import { getAccount } from "@/lib/store";
@@ -26,19 +27,26 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="shell">
       <aside className="sidebar">
         <Link href="/" className="brand">
+          <span className="logo">
+            <Icon name="send" size={17} />
+          </span>
           InstaAutoDM
         </Link>
-        <Link href="/automations/new" className="button block">
-          + New automation
-        </Link>
         <Nav />
-        <div className="account">
+        <div className="side-card">
+          <span className="avatar">{account.username[0]?.toUpperCase()}</span>
           <a href={`https://instagram.com/${account.username}`} target="_blank" rel="noreferrer">
-            @{account.username}
+            <strong>@{account.username}</strong>
           </a>
+          <span className="badge good">Connected</span>
           <ConnectButton label="Reconnect" subtle />
+        </div>
+        <div className="side-links">
           <form action={logout}>
-            <button className="link">Log out</button>
+            <button className="nav">
+              <Icon name="logout" />
+              Log out
+            </button>
           </form>
         </div>
       </aside>

@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { firstDm, matchesKeyword, summarize, readSigned, signValue, verifySignature } from "../lib/util.ts";
+import { change, daily, firstDm, matchesKeyword, summarize, readSigned, signValue, verifySignature } from "../lib/util.ts";
 
 test("keywords", () => {
   assert.ok(matchesKeyword("anything", ""));
@@ -48,4 +48,21 @@ test("summarize", () => {
   assert.equal(s.dmsSent, 3);
   assert.equal(s.linksDelivered, 1);
   assert.deepEqual(s.rows.map((r) => [r.username, r.status, r.text]), [["amy", "link_sent", "thanks"], ["bob", "no_match", "nice"]]);
+});
+
+test("daily + change", () => {
+  const DAY = 86_400_000;
+  const now = 10 * DAY + 5;
+  const d = daily(
+    [
+      { at: 10 * DAY + 1, igsid: "a", text: "x", status: "link_sent" },
+      { at: 9 * DAY, igsid: "b", status: "follow_asked" },
+      { at: 1 * DAY, igsid: "c", text: "old", status: "no_match" },
+    ],
+    3,
+    now,
+  );
+  assert.deepEqual(d.map((x) => [x.comments, x.dms]), [[0, 0], [0, 1], [1, 1]]);
+  assert.equal(change(15, 10), 50);
+  assert.equal(change(5, 0), null);
 });

@@ -10,11 +10,11 @@ export default async function NewAutomationPage() {
     <>
       <header className="page-head">
         <div>
-          <p className="muted">
+          <div className="crumbs">
             <Link href="/automations">Automations</Link> / New
-          </p>
-          <h1>Pick a video</h1>
-          <p className="muted">Choose the reel whose commenters should get the DM.</p>
+          </div>
+          <h1>Pick a reel</h1>
+          <p className="muted">Step 1 of 2: choose the reel whose commenters should get your link.</p>
         </div>
       </header>
 

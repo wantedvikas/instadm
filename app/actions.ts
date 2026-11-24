@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getInstagramAccount, subscribeWebhooks } from "@/lib/ig";
 import { clearSession, isLoggedIn, setSession } from "@/lib/session";
-import { deleteRule, setAccount, setRule } from "@/lib/store";
+import { deleteRule, getRule, setAccount, setRule } from "@/lib/store";
 
 // Instagram rejects DM text over 1000 characters.
 const text = (f: FormData, key: string, max = 1000) => String(f.get(key) ?? "").trim().slice(0, max);
@@ -58,6 +58,15 @@ export async function saveRule(_prev: FormState, f: FormData): Promise<FormState
   // React resets <form action> fields after submit; re-rendering with the saved rule makes the reset show the new values.
   revalidatePath("/", "layout");
   return { ok: true, at: Date.now() };
+}
+
+export async function toggleAutomation(mediaId: string) {
+  if (!(await isLoggedIn()) || !/^\d+$/.test(mediaId)) return;
+  const rule = await getRule(mediaId);
+  // An automation without a link can't be switched on; the editor explains what's missing.
+  if (!rule || (!rule.enabled && !rule.linkMessage)) return;
+  await setRule(mediaId, { ...rule, enabled: !rule.enabled });
+  revalidatePath("/", "layout");
 }
 
 export async function removeAutomation(mediaId: string) {

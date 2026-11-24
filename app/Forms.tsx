@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { connect, login, removeAutomation, type FormState } from "./actions";
+import { connect, login, removeAutomation, toggleAutomation, type FormState } from "./actions";
+import { Icon } from "./icons";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(login, {});
@@ -39,7 +40,21 @@ export function DeleteButton({ mediaId }: { mediaId: string }) {
         if (!confirm("Delete this automation and its analytics? People who comment will no longer get DMs.")) e.preventDefault();
       }}
     >
-      <button className="button danger small">Delete</button>
+      <button className="button danger small" aria-label="Delete automation">
+        <Icon name="trash" size={15} />
+        Delete
+      </button>
+    </form>
+  );
+}
+
+export function PauseButton({ mediaId, enabled }: { mediaId: string; enabled: boolean }) {
+  return (
+    <form action={toggleAutomation.bind(null, mediaId)}>
+      <button className="button ghost small">
+        <Icon name={enabled ? "pause" : "play"} size={15} />
+        {enabled ? "Pause" : "Resume"}
+      </button>
     </form>
   );
 }

@@ -65,6 +65,27 @@ export function summarize(events: DmEvent[]) {
   };
 }
 
+const DAY = 86_400_000;
+
+/**
+ * Comments and DMs per day for the last `days` days, oldest first.
+ * shortcut: days are cut at server midnight (UTC on Vercel); pass a timezone through if the chart looks a day off.
+ */
+export function daily(events: DmEvent[], days: number, now = Date.now()) {
+  const start = Math.floor(now / DAY) * DAY - (days - 1) * DAY;
+  const out = Array.from({ length: days }, (_, i) => ({ day: start + i * DAY, comments: 0, dms: 0 }));
+  for (const e of events) {
+    const slot = out[Math.floor((e.at - start) / DAY)];
+    if (!slot) continue;
+    if (e.text !== undefined) slot.comments++;
+    if (DM_SENT.includes(e.status)) slot.dms++;
+  }
+  return out;
+}
+
+/** Percent change from `before` to `after`; null when there is nothing to compare against. */
+export const change = (after: number, before: number) => (before ? Math.round(((after - before) / before) * 100) : null);
+
 /** Signed session value: "<igId>.<hmac>". */
 export function signValue(value: string, secret: string) {
   return value + "." + createHmac("sha256", secret).update(value).digest("hex");
