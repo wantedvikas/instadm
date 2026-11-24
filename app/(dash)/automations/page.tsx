@@ -2,7 +2,7 @@ import Link from "next/link";
 import { loadDashboard } from "../../data";
 import { DeleteButton, PauseButton } from "../../Forms";
 import { Icon } from "../../icons";
-import { Thumb } from "../../ui";
+import { Thumb, reelTitle } from "../../ui";
 
 export default async function AutomationsPage() {
   const { automations } = await loadDashboard();
@@ -49,7 +49,12 @@ export default async function AutomationsPage() {
                     <td>
                       <Link href={`/automations/${a.mediaId}`} className="video-cell">
                         <Thumb media={a.media} size={38} />
-                        <strong>{a.media ? new Date(a.media.timestamp).toLocaleDateString() : "Deleted reel"}</strong>
+                        <div style={{ minWidth: 0 }}>
+                          {reelTitle(a.media) && <strong className="item-title" style={{ display: "block", maxWidth: 240 }}>{reelTitle(a.media)}</strong>}
+                          <div className={reelTitle(a.media) ? "item-sub" : undefined}>
+                            {a.media ? new Date(a.media.timestamp).toLocaleDateString() : "Deleted reel"}
+                          </div>
+                        </div>
                       </Link>
                     </td>
                     <td className="clip">{a.rule.keywords || <span className="muted">Any comment</span>}</td>

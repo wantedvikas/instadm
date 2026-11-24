@@ -39,6 +39,9 @@ export const Avatar = ({ name, small }: { name?: string; small?: boolean }) => (
   <span className={small ? "avatar sm" : "avatar"}>{(name ?? "?")[0]?.toUpperCase()}</span>
 );
 
+/** First line of the reel's caption, used as its title. */
+export const reelTitle = (media?: Media) => media?.caption?.trim().split("\n")[0].trim() || undefined;
+
 /* eslint-disable @next/next/no-img-element -- Instagram CDN URLs expire; next/image would only cache dead links */
 export const Thumb = ({ media, size = 48 }: { media?: Media; size?: number }) =>
   media ? (

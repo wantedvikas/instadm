@@ -33,6 +33,7 @@ export type Media = {
   permalink: string;
   timestamp: string;
   comments_count?: number;
+  caption?: string;
 };
 
 /** All videos/reels, newest first. */
@@ -42,7 +43,7 @@ export async function listVideos(igId: string) {
   // shortcut: stops at 500 posts; add a "load more" if the account grows past that.
   for (let page = 0; page < 10; page++) {
     const r = await call<{ data: Media[]; paging?: { cursors?: { after?: string }; next?: string } }>(
-      `/${igId}/media?fields=id,media_type,thumbnail_url,media_url,permalink,timestamp,comments_count&limit=50${
+      `/${igId}/media?fields=id,media_type,thumbnail_url,media_url,permalink,timestamp,comments_count,caption&limit=50${
         after ? `&after=${after}` : ""
       }`,
     );
