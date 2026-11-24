@@ -99,6 +99,7 @@ main.center { min-height: 100vh; display: grid; place-items: center; padding: 16
 .item:last-child { border-bottom: 0; }
 a.item:hover { text-decoration: none; background: var(--soft); border-radius: 12px; }
 .item-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-trigger { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-sub { font-size: 12px; color: var(--muted); }
 .meter { width: 90px; height: 6px; border-radius: 999px; background: var(--soft); overflow: hidden; }
 .meter span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }

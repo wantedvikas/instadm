@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { loadDashboard } from "../data";
 import { Icon } from "../icons";
-import { AreaChart, Avatar, Stat, StatusBadge, Thumb, ago } from "../ui";
+import { AreaChart, Avatar, Stat, StatusBadge, Thumb, ago, reelTitle } from "../ui";
 import { change, daily } from "@/lib/util";
 
 export default async function Home() {
@@ -80,7 +80,8 @@ export default async function Home() {
                   <Link key={a.mediaId} href={`/automations/${a.mediaId}`} className="item">
                     <Thumb media={a.media} size={40} />
                     <div style={{ minWidth: 0 }}>
-                      <div className="item-title">{a.rule.keywords ? `“${a.rule.keywords}”` : "Any comment"}</div>
+                      {reelTitle(a.media) && <div className="item-title">{reelTitle(a.media)}</div>}
+                      <div className={reelTitle(a.media) ? "item-trigger" : "item-title"}>{a.rule.keywords ? `“${a.rule.keywords}”` : "Any comment"}</div>
                       <div className="item-sub">
                         {a.media ? new Date(a.media.timestamp).toLocaleDateString() : "Deleted video"} ·{" "}
                         {a.rule.followGate ? "Followers only" : "Link in first DM"}
