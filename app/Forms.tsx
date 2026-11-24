@@ -17,11 +17,13 @@ export function LoginForm() {
   );
 }
 
-export function ConnectButton({ label }: { label: string }) {
+export function ConnectButton({ label, subtle }: { label: string; subtle?: boolean }) {
   const [state, action, pending] = useActionState<FormState>(connect, {});
   return (
     <form action={action} className="row">
-      <button disabled={pending}>{pending ? "Connecting…" : label}</button>
+      <button className={subtle ? "button ghost small" : undefined} disabled={pending}>
+        {pending ? "Connecting…" : label}
+      </button>
       <span role="status" className={state.error ? "err" : "ok"}>
         {state.error ?? (state.ok ? "Connected ✓" : "")}
       </span>

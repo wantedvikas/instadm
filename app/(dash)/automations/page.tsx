@@ -54,11 +54,13 @@ export default async function AutomationsPage() {
                   <td className="num">{a.stats.comments}</td>
                   <td className="num">{a.stats.dmsSent}</td>
                   <td className="num">{a.stats.linksDelivered}</td>
-                  <td className="actions">
-                    <Link href={`/automations/${a.mediaId}`} className="button ghost small">
-                      Edit
-                    </Link>
-                    <DeleteButton mediaId={a.mediaId} />
+                  <td>
+                    <div className="actions">
+                      <Link href={`/automations/${a.mediaId}`} className="button ghost small">
+                        Edit
+                      </Link>
+                      <DeleteButton mediaId={a.mediaId} />
+                    </div>
                   </td>
                 </tr>
               ))}

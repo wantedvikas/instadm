@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <a href={`https://instagram.com/${account.username}`} target="_blank" rel="noreferrer">
             @{account.username}
           </a>
-          <ConnectButton label="Reconnect" />
+          <ConnectButton label="Reconnect" subtle />
           <form action={logout}>
             <button className="link">Log out</button>
           </form>
