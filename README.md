@@ -1,8 +1,10 @@
-# InstaAutoDM
+# InstaAutoDM: free, open-source Instagram comment-to-DM automation
 
-**Self-hosted Instagram comment-to-DM automation.** Someone comments on your reel, and they get the link you promised in their DMs, optionally only if they follow you. Built for creators who say "comment LINK and I'll send it to you" and want that to happen automatically, for free, on their own infrastructure.
+**Auto-DM links to people who comment on your Instagram reels.** Someone comments "LINK" on your reel, and they instantly get your GitHub repo, website, course or freebie in their DMs, optionally only if they follow you. It's a self-hosted, open-source **ManyChat alternative** for creators: no monthly fee, no third-party automation service, and your data stays in your own database.
 
-It runs on Next.js, deploys to Vercel, and stores data in Upstash Redis. You need no third-party automation service and no monthly fee.
+Built on the official **Meta Instagram Graph API** (webhooks plus private replies), with **Next.js**, **Vercel** and **Upstash Redis**. It deploys on free tiers in about 45 minutes.
+
+**Keywords:** Instagram auto DM · comment to DM · Instagram DM automation · auto reply Instagram comments · Instagram bot · ManyChat alternative · LinkDM alternative · Instagram Graph API · Meta webhooks · send link in DM · follow-to-unlock · creator tools
 
 ---
 

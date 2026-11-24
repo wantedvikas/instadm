@@ -2,6 +2,26 @@
   "name": "insta-auto-dm",
   "version": "0.1.0",
   "private": true,
+  "description": "Free, open-source Instagram comment-to-DM automation: auto-send links to people who comment on your reels, with follower check, public replies and analytics.",
+  "keywords": [
+    "instagram",
+    "instagram-automation",
+    "instagram-dm",
+    "comment-to-dm",
+    "auto-dm",
+    "instagram-bot",
+    "manychat-alternative",
+    "instagram-graph-api",
+    "meta-webhooks",
+    "nextjs",
+    "vercel",
+    "upstash"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wantedvikas/instadm"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
