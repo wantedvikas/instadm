@@ -86,6 +86,12 @@ export function daily(events: DmEvent[], days: number, now = Date.now()) {
 /** Percent change from `before` to `after`; null when there is nothing to compare against. */
 export const change = (after: number, before: number) => (before ? Math.round(((after - before) / before) * 100) : null);
 
+/** One random non-empty line, so public replies aren't identical on every comment. */
+export function pickLine(text: string, rand = Math.random) {
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  return lines.length ? lines[Math.floor(rand() * lines.length)] : null;
+}
+
 /** Signed session value: "<igId>.<hmac>". */
 export function signValue(value: string, secret: string) {
   return value + "." + createHmac("sha256", secret).update(value).digest("hex");

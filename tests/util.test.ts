@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { change, daily, firstDm, matchesKeyword, summarize, readSigned, signValue, verifySignature } from "../lib/util.ts";
+import { change, daily, firstDm, matchesKeyword, pickLine, summarize, readSigned, signValue, verifySignature } from "../lib/util.ts";
 
 test("keywords", () => {
   assert.ok(matchesKeyword("anything", ""));
@@ -65,4 +65,9 @@ test("daily + change", () => {
   assert.deepEqual(d.map((x) => [x.comments, x.dms]), [[0, 0], [0, 1], [1, 1]]);
   assert.equal(change(15, 10), 50);
   assert.equal(change(5, 0), null);
+});
+
+test("pickLine", () => {
+  assert.equal(pickLine("a\n\n b \nc", () => 0.5), "b");
+  assert.equal(pickLine("  \n", () => 0), null);
 });

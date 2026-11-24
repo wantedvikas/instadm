@@ -67,6 +67,10 @@ function sendMessage(_igId: string, recipient: object, text: string, quickReplie
 export const sendDM = (igId: string, igsid: string, text: string, quickReplies?: QuickReply[]) =>
   sendMessage(igId, { id: igsid }, text, quickReplies);
 
+/** Public reply under a comment (needs instagram_manage_comments). */
+export const replyToComment = (commentId: string, message: string) =>
+  call(`/${commentId}/replies?message=${encodeURIComponent(message)}`, { method: "POST" });
+
 export const sendPrivateText = (igId: string, commentId: string, text: string) =>
   sendMessage(igId, { comment_id: commentId }, text);
 

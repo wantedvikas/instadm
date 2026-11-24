@@ -1,6 +1,6 @@
-import { followsMe, sendDM, sendPrivateReply, sendPrivateText } from "./ig";
-import { clearPending, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account } from "./store";
-import { firstDm, matchesKeyword, type DmStatus } from "./util";
+import { followsMe, replyToComment, sendDM, sendPrivateReply, sendPrivateText } from "./ig";
+import { clearPending, DEFAULT_RULE, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account } from "./store";
+import { firstDm, matchesKeyword, pickLine, type DmStatus } from "./util";
 
 // Quick-reply titles are cut at 20 characters.
 const linkButton = (mediaId: string) => ({ content_type: "text" as const, title: "Send me the link", payload: `GET:${mediaId}` });
@@ -48,15 +48,26 @@ async function onComment(account: Account, v: CommentValue) {
     if (!dm.withButton) {
       await sendPrivateText(account.igId, commentId, dm.text);
       await log("link_sent");
-      return console.log(`Link sent directly for comment ${commentId}`);
+      console.log(`Link sent directly for comment ${commentId}`);
+    } else {
+      await setPending(from, mediaId);
+      await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
+      await log("button_sent");
+      console.log(`Private reply with button sent for comment ${commentId}`);
     }
-    await setPending(from, mediaId);
-    await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
-    await log("button_sent");
-    console.log(`Private reply with button sent for comment ${commentId}`);
   } catch (err) {
     await log("failed");
     throw err;
+  }
+
+  // Public "check your DMs" nudge, only after the DM went out. Rules saved before this feature get the default.
+  const reply = pickLine(rule.publicReply ?? DEFAULT_RULE.publicReply ?? "");
+  if (!reply) return;
+  try {
+    await replyToComment(commentId, reply);
+    console.log(`Public reply posted on comment ${commentId}`);
+  } catch (err) {
+    console.error("Public reply failed (DM was still sent):", err);
   }
 }
 

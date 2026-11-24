@@ -18,6 +18,7 @@ export type Rule = {
   linkMessage: string; // the promised link / repo / code
   followGate: boolean;
   followText: string; // sent when follow gate is on and they don't follow yet
+  publicReply?: string; // replies posted under the comment, one per line (random pick); empty = off; missing on older rules
 };
 
 export const getAccount = () => redis.get<Account>("account");
@@ -30,6 +31,7 @@ export const DEFAULT_RULE: Rule = {
   linkMessage: "",
   followGate: false,
   followText: "Almost there! Please follow me first, then tap “I followed ✅” and I'll send the link 🙏",
+  publicReply: "Sent you a DM 📩\nCheck your DMs 🔥\nJust sent it to you! Check message requests if you don't see it 📬",
 };
 
 export const getRules = async () => (await redis.hgetall<Record<string, Rule>>("rules")) ?? {};

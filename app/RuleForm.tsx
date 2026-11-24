@@ -50,6 +50,12 @@ export function RuleForm({ mediaId, rule, username }: { mediaId: string; rule: R
           <input type="hidden" name="followText" value={draft.followText} />
         )}
 
+        <label>
+          Public reply under the comment{" "}
+          <span className="hint">Posted after the DM so people know to check their inbox. One per line, picked at random. Leave empty to turn off.</span>
+          <textarea name="publicReply" rows={3} defaultValue={rule.publicReply ?? ""} onChange={set("publicReply")} />
+        </label>
+
         <div className="row">
           <button type="submit" className="button primary" disabled={pending}>
             {pending ? "Saving…" : "Save automation"}
@@ -71,6 +77,7 @@ function Preview({ rule, username }: { rule: Rule; username: string }) {
   const greeting = rule.replyText.replaceAll("{username}", name).trim();
   const link = rule.linkMessage.trim() || "Your link appears here";
   const keyword = rule.keywords.split(",")[0]?.trim() || "link please 🙏";
+  const publicReply = (rule.publicReply ?? "").split("\n").map((l) => l.trim()).find(Boolean);
 
   return (
     <aside className="phone" aria-label="DM preview">
@@ -78,6 +85,7 @@ function Preview({ rule, username }: { rule: Rule; username: string }) {
         <span className="avatar sm">{username[0]?.toUpperCase()}</span>@{username}
       </div>
       <div className="phone-note">@{name} commented “{keyword}” on your reel</div>
+      {publicReply && <div className="phone-note">You replied publicly: “{publicReply}”</div>}
       {rule.followGate ? (
         <>
           <div className="msg them">{greeting}</div>
