@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
-import { firstDm, matchesKeyword, readSigned, signValue, verifySignature } from "../lib/util.ts";
+import { firstDm, matchesKeyword, summarize, readSigned, signValue, verifySignature } from "../lib/util.ts";
 
 test("keywords", () => {
   assert.ok(matchesKeyword("anything", ""));
@@ -34,4 +34,18 @@ test("first DM", () => {
   assert.deepEqual(firstDm(rule, "sam"), { text: "Hey sam!\n\nhttps://x.dev", withButton: false });
   assert.deepEqual(firstDm({ ...rule, followGate: true }, "sam"), { text: "Hey sam!", withButton: true });
   assert.equal(firstDm({ ...rule, replyText: "" }, "sam").text, "https://x.dev");
+});
+
+test("summarize", () => {
+  const s = summarize([
+    { at: 1, igsid: "a", username: "amy", text: "link pls", status: "button_sent" },
+    { at: 2, igsid: "a", status: "follow_asked" },
+    { at: 3, igsid: "a", status: "link_sent" },
+    { at: 4, igsid: "b", username: "bob", text: "nice", status: "no_match" },
+    { at: 5, igsid: "a", username: "amy", text: "thanks", status: "no_match" },
+  ]);
+  assert.equal(s.comments, 3);
+  assert.equal(s.dmsSent, 3);
+  assert.equal(s.linksDelivered, 1);
+  assert.deepEqual(s.rows.map((r) => [r.username, r.status, r.text]), [["amy", "link_sent", "thanks"], ["bob", "no_match", "nice"]]);
 });

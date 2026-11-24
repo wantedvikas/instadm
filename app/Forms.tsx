@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { connect, login, type FormState } from "./actions";
+import { connect, login, removeAutomation, type FormState } from "./actions";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(login, {});
@@ -25,6 +25,19 @@ export function ConnectButton({ label }: { label: string }) {
       <span role="status" className={state.error ? "err" : "ok"}>
         {state.error ?? (state.ok ? "Connected ✓" : "")}
       </span>
+    </form>
+  );
+}
+
+export function DeleteButton({ mediaId }: { mediaId: string }) {
+  return (
+    <form
+      action={removeAutomation.bind(null, mediaId)}
+      onSubmit={(e) => {
+        if (!confirm("Delete this automation and its analytics? People who comment will no longer get DMs.")) e.preventDefault();
+      }}
+    >
+      <button className="button danger small">Delete</button>
     </form>
   );
 }

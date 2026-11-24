@@ -36,6 +36,35 @@ export function firstDm(
   return { text: [greeting, rule.linkMessage.trim()].filter(Boolean).join("\n\n").slice(0, 1000), withButton: false };
 }
 
+/** What happened to one commenter on one automated video. Comment events carry `text`. */
+export type DmStatus = "paused" | "no_match" | "failed" | "button_sent" | "follow_asked" | "link_sent";
+export type DmEvent = { at: number; igsid: string; username?: string; text?: string; status: DmStatus };
+export type Person = { igsid: string; username?: string; text?: string; at: number; status: DmStatus };
+
+// Later in this list = further along; a person's row shows the furthest status they reached.
+const RANK: DmStatus[] = ["paused", "no_match", "failed", "button_sent", "follow_asked", "link_sent"];
+const DM_SENT: DmStatus[] = ["button_sent", "follow_asked", "link_sent"];
+
+/** Per-video analytics: one row per commenter plus totals. */
+export function summarize(events: DmEvent[]) {
+  const people = new Map<string, Person>();
+  for (const e of [...events].sort((a, b) => a.at - b.at)) {
+    const p = people.get(e.igsid) ?? { igsid: e.igsid, at: e.at, status: e.status };
+    if (e.username) p.username = e.username;
+    if (e.text !== undefined) p.text = e.text;
+    if (RANK.indexOf(e.status) >= RANK.indexOf(p.status)) p.status = e.status;
+    p.at = e.at;
+    people.set(e.igsid, p);
+  }
+  const rows = [...people.values()].sort((a, b) => b.at - a.at);
+  return {
+    rows,
+    comments: events.filter((e) => e.text !== undefined).length,
+    dmsSent: events.filter((e) => DM_SENT.includes(e.status)).length,
+    linksDelivered: rows.filter((r) => r.status === "link_sent").length,
+  };
+}
+
 /** Signed session value: "<igId>.<hmac>". */
 export function signValue(value: string, secret: string) {
   return value + "." + createHmac("sha256", secret).update(value).digest("hex");

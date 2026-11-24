@@ -13,7 +13,7 @@ export function RuleForm({ mediaId, rule }: { mediaId: string; rule: Rule }) {
 
       <label className="toggle">
         <input type="checkbox" name="enabled" defaultChecked={rule.enabled} />
-        Auto-DM commenters on this video
+        Active (DM people who comment on this video)
       </label>
 
       <label>
@@ -43,7 +43,7 @@ export function RuleForm({ mediaId, rule }: { mediaId: string; rule: Rule }) {
 
       <div className="row">
         <button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save"}
+          {pending ? "Saving…" : "Save automation"}
         </button>
         <span role="status" className={state.error ? "err" : "ok"}>
           {state.error ?? (state.ok ? "Saved ✓" : "")}

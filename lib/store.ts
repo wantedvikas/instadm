@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import type { DmEvent } from "./util";
 
 // Vercel's Upstash integration sets KV_REST_API_*; a direct Upstash setup uses UPSTASH_REDIS_REST_*.
 const redis = new Redis({
@@ -22,9 +23,26 @@ export type Rule = {
 export const getAccount = () => redis.get<Account>("account");
 export const setAccount = (a: Account) => redis.set("account", a);
 
+export const DEFAULT_RULE: Rule = {
+  enabled: true,
+  keywords: "",
+  replyText: "Hey {username}! Thanks for the comment 🙌 Here's what I promised:",
+  linkMessage: "",
+  followGate: false,
+  followText: "Almost there! Please follow me first, then tap “I followed ✅” and I'll send the link 🙏",
+};
+
 export const getRules = async () => (await redis.hgetall<Record<string, Rule>>("rules")) ?? {};
 export const getRule = (mediaId: string) => redis.hget<Rule>("rules", mediaId);
 export const setRule = (mediaId: string, rule: Rule) => redis.hset("rules", { [mediaId]: rule });
+export const deleteRule = (mediaId: string) => Promise.all([redis.hdel("rules", mediaId), redis.del(`events:${mediaId}`)]);
+
+// shortcut: keeps the latest 1000 events per video; move to a real database if videos get more comments than that.
+export async function logEvent(mediaId: string, e: DmEvent) {
+  await redis.lpush(`events:${mediaId}`, e);
+  await redis.ltrim(`events:${mediaId}`, 0, 999);
+}
+export const getEvents = async (mediaId: string) => (await redis.lrange<DmEvent>(`events:${mediaId}`, 0, 999)) ?? [];
 
 // shortcut: one pending video per commenter (latest comment wins); store a list if people often comment on several videos at once.
 export const setPending = (igsid: string, mediaId: string) => redis.set(`pending:${igsid}`, mediaId, { ex: WEEK });

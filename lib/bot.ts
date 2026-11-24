@@ -1,6 +1,6 @@
 import { followsMe, sendDM, sendPrivateReply, sendPrivateText } from "./ig";
-import { clearPending, firstTime, getAccount, getPending, getRule, setPending, type Account } from "./store";
-import { firstDm, matchesKeyword } from "./util";
+import { clearPending, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account } from "./store";
+import { firstDm, matchesKeyword, type DmStatus } from "./util";
 
 // Quick-reply titles are cut at 20 characters.
 const linkButton = (mediaId: string) => ({ content_type: "text" as const, title: "Send me the link", payload: `GET:${mediaId}` });
@@ -34,18 +34,30 @@ async function onComment(account: Account, v: CommentValue) {
   if (from === account.igId) return console.log("Comment skipped: your own comment");
 
   const rule = await getRule(mediaId);
-  if (!rule?.enabled) return console.log(`Comment skipped: auto-DM off for media ${mediaId}`);
-  if (!matchesKeyword(v.text ?? "", rule.keywords)) return console.log("Comment skipped: no keyword match");
+  if (!rule) return console.log(`Comment skipped: no automation for media ${mediaId}`);
   if (!(await firstTime(`c:${commentId}`))) return console.log("Comment skipped: already handled");
 
+  // Every comment on an automated video is recorded, so the dashboard shows who commented and what they got.
+  const log = (status: DmStatus) =>
+    logEvent(mediaId, { at: Date.now(), igsid: from, username: v.from?.username, text: v.text ?? "", status });
+  if (!rule.enabled) return log("paused");
+  if (!matchesKeyword(v.text ?? "", rule.keywords)) return log("no_match");
+
   const dm = firstDm(rule, v.from?.username ?? "there");
-  if (!dm.withButton) {
-    await sendPrivateText(account.igId, commentId, dm.text);
-    return console.log(`Link sent directly for comment ${commentId}`);
+  try {
+    if (!dm.withButton) {
+      await sendPrivateText(account.igId, commentId, dm.text);
+      await log("link_sent");
+      return console.log(`Link sent directly for comment ${commentId}`);
+    }
+    await setPending(from, mediaId);
+    await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
+    await log("button_sent");
+    console.log(`Private reply with button sent for comment ${commentId}`);
+  } catch (err) {
+    await log("failed");
+    throw err;
   }
-  await setPending(from, mediaId);
-  await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
-  console.log(`Private reply with button sent for comment ${commentId}`);
 }
 
 /** Step 2: they tap a button (or type anything) -> follow check -> link or "follow first". */
@@ -73,12 +85,14 @@ async function onMessage(account: Account, e: MessagingEvent) {
     }
     if (!follows) {
       await sendDM(account.igId, sender, rule.followText, [followedButton(mediaId)]);
+      await logEvent(mediaId, { at: Date.now(), igsid: sender, status: "follow_asked" });
       return console.log("Sent follow-first message");
     }
   }
 
   await sendDM(account.igId, sender, rule.linkMessage);
   await clearPending(sender);
+  await logEvent(mediaId, { at: Date.now(), igsid: sender, status: "link_sent" });
   console.log("Sent link message");
 }
 

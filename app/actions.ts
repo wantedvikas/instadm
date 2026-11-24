@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getInstagramAccount, subscribeWebhooks } from "@/lib/ig";
 import { clearSession, isLoggedIn, setSession } from "@/lib/session";
-import { setAccount, setRule } from "@/lib/store";
+import { deleteRule, setAccount, setRule } from "@/lib/store";
 
 // Instagram rejects DM text over 1000 characters.
 const text = (f: FormData, key: string, max = 1000) => String(f.get(key) ?? "").trim().slice(0, max);
@@ -33,7 +33,7 @@ export async function connect(): Promise<FormState> {
     console.error("Connect failed:", e);
     return { error: e instanceof Error ? e.message : "Could not reach Instagram" };
   }
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { ok: true, at: Date.now() };
 }
 
@@ -56,11 +56,18 @@ export async function saveRule(_prev: FormState, f: FormData): Promise<FormState
 
   await setRule(mediaId, rule);
   // React resets <form action> fields after submit; re-rendering with the saved rule makes the reset show the new values.
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { ok: true, at: Date.now() };
+}
+
+export async function removeAutomation(mediaId: string) {
+  if (!(await isLoggedIn()) || !/^\d+$/.test(mediaId)) return;
+  await deleteRule(mediaId);
+  revalidatePath("/", "layout");
+  redirect("/automations");
 }
 
 export async function logout() {
   await clearSession();
-  redirect("/");
+  redirect("/login");
 }
