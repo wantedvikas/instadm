@@ -6,6 +6,26 @@ Built on the official **Meta Instagram Graph API** (webhooks plus private replie
 
 **Keywords:** Instagram auto DM · comment to DM · Instagram DM automation · auto reply Instagram comments · Instagram bot · ManyChat alternative · LinkDM alternative · Instagram Graph API · Meta webhooks · send link in DM · follow-to-unlock · creator tools
 
+![InstaAutoDM dashboard: stats, comments vs DMs chart, top automations and live activity feed](docs/screenshots/home.jpg)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/editor.jpg" alt="Automation editor with a live phone-style preview of the DM, follow-to-unlock and public reply settings" /></td>
+    <td width="50%"><img src="docs/screenshots/new-automation.jpg" alt="Pick a reel to automate from a grid of your Instagram videos" /></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Automation editor</b> with live DM preview</td>
+    <td align="center"><b>Pick a reel</b> to automate</td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/automations.jpg" alt="All automations with status, comment, DM and link counts, plus pause, edit and delete" /></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><b>All automations</b>: pause, resume, edit and delete in one place</td>
+  </tr>
+</table>
+
+
 ---
 
 ## Contents
