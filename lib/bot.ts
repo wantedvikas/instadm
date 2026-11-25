@@ -1,12 +1,13 @@
 import { followsMe, replyToComment, sendDM, sendPrivateReply, sendPrivateText, type Button } from "./ig";
-import { clearPending, DEFAULT_RULE, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account } from "./store";
+import { clearPending, DEFAULT_RULE, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account, type Rule } from "./store";
 import { firstDm, matchesKeyword, pickLine, type DmStatus } from "./util";
 
-// Button titles are cut at 20 characters.
-const linkButton = (mediaId: string): Button => ({ type: "postback", title: "Send me the access", payload: `GET:${mediaId}` });
-const followButtons = (mediaId: string, username: string): Button[] => [
-  { type: "web_url", title: "Open profile", url: `https://www.instagram.com/${username}/` },
-  { type: "postback", title: "I followed ✅", payload: `GET:${mediaId}` },
+// Button titles are cut at 20 characters; empty labels fall back to the defaults.
+const label = (rule: Rule, k: "accessLabel" | "profileLabel" | "followedLabel") => rule[k] || DEFAULT_RULE[k]!;
+const linkButton = (mediaId: string, rule: Rule): Button => ({ type: "postback", title: label(rule, "accessLabel"), payload: `GET:${mediaId}` });
+const followButtons = (mediaId: string, rule: Rule, username: string): Button[] => [
+  { type: "web_url", title: label(rule, "profileLabel"), url: `https://www.instagram.com/${username}/` },
+  { type: "postback", title: label(rule, "followedLabel"), payload: `GET:${mediaId}` },
 ];
 
 type CommentValue = {
@@ -54,7 +55,7 @@ async function onComment(account: Account, v: CommentValue) {
       console.log(`Link sent directly for comment ${commentId}`);
     } else {
       await setPending(from, mediaId);
-      await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId));
+      await sendPrivateReply(account.igId, commentId, dm.text, linkButton(mediaId, rule));
       await log("button_sent");
       console.log(`Private reply with button sent for comment ${commentId}`);
     }
@@ -98,7 +99,7 @@ async function onMessage(account: Account, e: MessagingEvent) {
       console.error("Follow check failed, sending link anyway:", err);
     }
     if (!follows) {
-      await sendDM(account.igId, sender, rule.followText, followButtons(mediaId, account.username));
+      await sendDM(account.igId, sender, rule.followText, followButtons(mediaId, rule, account.username));
       await logEvent(mediaId, { at: Date.now(), igsid: sender, status: "follow_asked" });
       return console.log("Sent follow-first message");
     }

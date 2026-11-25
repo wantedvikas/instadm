@@ -42,12 +42,31 @@ export function RuleForm({ mediaId, rule, username }: { mediaId: string; rule: R
         </label>
 
         {draft.followGate ? (
-          <label>
-            Follow-first message <span className="hint">Sent to non-followers with an “I followed ✅” button.</span>
-            <textarea name="followText" rows={2} defaultValue={draft.followText} onChange={set("followText")} />
-          </label>
+          <>
+            <label>
+              Button on the first DM <span className="hint">Up to 20 characters. Empty uses the default.</span>
+              <input name="accessLabel" maxLength={20} defaultValue={draft.accessLabel} onChange={set("accessLabel")} />
+            </label>
+            <label>
+              Follow-first message <span className="hint">Sent to non-followers with the two buttons below.</span>
+              <textarea name="followText" rows={2} defaultValue={draft.followText} onChange={set("followText")} />
+            </label>
+            <label>
+              Profile button <span className="hint">Opens your Instagram profile.</span>
+              <input name="profileLabel" maxLength={20} defaultValue={draft.profileLabel} onChange={set("profileLabel")} />
+            </label>
+            <label>
+              “Followed” button <span className="hint">Checks again and sends the link.</span>
+              <input name="followedLabel" maxLength={20} defaultValue={draft.followedLabel} onChange={set("followedLabel")} />
+            </label>
+          </>
         ) : (
-          <input type="hidden" name="followText" value={draft.followText} />
+          <>
+            <input type="hidden" name="followText" value={draft.followText} />
+            <input type="hidden" name="accessLabel" value={draft.accessLabel ?? ""} />
+            <input type="hidden" name="profileLabel" value={draft.profileLabel ?? ""} />
+            <input type="hidden" name="followedLabel" value={draft.followedLabel ?? ""} />
+          </>
         )}
 
         <label>
@@ -77,6 +96,7 @@ function Preview({ rule, username }: { rule: Rule; username: string }) {
   const greeting = rule.replyText.replaceAll("{username}", name).trim();
   const link = rule.linkMessage.trim() || "Your link appears here";
   const keyword = rule.keywords.split(",")[0]?.trim() || "link please 🙏";
+  const access = rule.accessLabel;
   const publicReply = (rule.publicReply ?? "").split("\n").map((l) => l.trim()).find(Boolean);
 
   return (
@@ -90,13 +110,13 @@ function Preview({ rule, username }: { rule: Rule; username: string }) {
         <>
           <div className="msg them">
             {greeting}
-            <span className="msg-btn">Send me the access</span>
+            <span className="msg-btn">{access}</span>
           </div>
-          <div className="msg me">Send me the access</div>
+          <div className="msg me">{access}</div>
           <div className="msg them">
             {rule.followText}
-            <span className="msg-btn">Open profile</span>
-            <span className="msg-btn">I followed ✅</span>
+            <span className="msg-btn">{rule.profileLabel}</span>
+            <span className="msg-btn">{rule.followedLabel}</span>
           </div>
           <div className="phone-note">after they follow and tap</div>
           <div className="msg them">{link}</div>

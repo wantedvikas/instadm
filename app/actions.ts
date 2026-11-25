@@ -50,6 +50,9 @@ export async function saveRule(_prev: FormState, f: FormData): Promise<FormState
     linkMessage: text(f, "linkMessage"),
     followGate: f.get("followGate") === "on",
     followText: text(f, "followText"),
+    accessLabel: text(f, "accessLabel", 20),
+    profileLabel: text(f, "profileLabel", 20),
+    followedLabel: text(f, "followedLabel", 20),
     publicReply: text(f, "publicReply", 2000),
   };
   if (rule.enabled && (!rule.replyText || !rule.linkMessage)) return { error: "Fill in the reply and the link message" };

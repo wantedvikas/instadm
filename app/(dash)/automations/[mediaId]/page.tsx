@@ -56,7 +56,7 @@ export default async function AutomationPage({ params }: PageProps<"/automations
         <div className="panel-head">
           <h2>{existing ? "Settings" : "Set up the DM"}</h2>
         </div>
-        <RuleForm mediaId={mediaId} rule={existing ? { ...existing.rule, publicReply: existing.rule.publicReply ?? DEFAULT_RULE.publicReply } : DEFAULT_RULE} username={account.username} />
+        <RuleForm mediaId={mediaId} rule={existing ? { ...DEFAULT_RULE, ...existing.rule } : DEFAULT_RULE} username={account.username} />
       </section>
 
       {existing && (

@@ -18,6 +18,10 @@ export type Rule = {
   linkMessage: string; // the promised link / repo / code
   followGate: boolean;
   followText: string; // sent when follow gate is on and they don't follow yet
+  // Button labels (max 20 chars); missing on older rules, so read them through DEFAULT_RULE.
+  accessLabel?: string;
+  profileLabel?: string;
+  followedLabel?: string;
   publicReply?: string; // replies posted under the comment, one per line (random pick); empty = off; missing on older rules
 };
 
@@ -31,6 +35,9 @@ export const DEFAULT_RULE: Rule = {
   linkMessage: "",
   followGate: false,
   followText: "Almost there! Please follow me first, then tap “I followed ✅” and I'll send the link 🙏",
+  accessLabel: "Send me the access",
+  profileLabel: "Open profile",
+  followedLabel: "I followed ✅",
   publicReply: "Sent you a DM 📩\nCheck your DMs 🔥\nJust sent it to you! Check message requests if you don't see it 📬",
 };
 
