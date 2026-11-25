@@ -88,11 +88,16 @@ function Preview({ rule, username }: { rule: Rule; username: string }) {
       {publicReply && <div className="phone-note">You replied publicly: “{publicReply}”</div>}
       {rule.followGate ? (
         <>
-          <div className="msg them">{greeting}</div>
-          <span className="quick">Send me the link</span>
-          <div className="msg me">Send me the link</div>
-          <div className="msg them">{rule.followText}</div>
-          <span className="quick">I followed ✅</span>
+          <div className="msg them">
+            {greeting}
+            <span className="msg-btn">Send me the access</span>
+          </div>
+          <div className="msg me">Send me the access</div>
+          <div className="msg them">
+            {rule.followText}
+            <span className="msg-btn">Open profile</span>
+            <span className="msg-btn">I followed ✅</span>
+          </div>
           <div className="phone-note">after they follow and tap</div>
           <div className="msg them">{link}</div>
         </>

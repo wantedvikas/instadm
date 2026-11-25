@@ -179,7 +179,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .msg { max-width: 88%; padding: 10px 14px; border-radius: 18px; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .msg.them { background: var(--bg); border: 1px solid var(--border); border-bottom-left-radius: 6px; }
 .msg.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
-.quick { align-self: flex-start; padding: 6px 12px; border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--bg); }
+.msg-btn { display: block; margin-top: 8px; padding: 7px 10px; border-radius: 10px; background: var(--border); text-align: center; font-weight: 700; white-space: normal; }
 .phone-note { font-size: 11px; color: var(--muted); text-align: center; }
 
 /* Tablet: activity column moves under the main column */

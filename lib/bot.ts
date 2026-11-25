@@ -1,10 +1,13 @@
-import { followsMe, replyToComment, sendDM, sendPrivateReply, sendPrivateText } from "./ig";
+import { followsMe, replyToComment, sendDM, sendPrivateReply, sendPrivateText, type Button } from "./ig";
 import { clearPending, DEFAULT_RULE, firstTime, getAccount, getPending, getRule, logEvent, setPending, type Account } from "./store";
 import { firstDm, matchesKeyword, pickLine, type DmStatus } from "./util";
 
-// Quick-reply titles are cut at 20 characters.
-const linkButton = (mediaId: string) => ({ content_type: "text" as const, title: "Send me the link", payload: `GET:${mediaId}` });
-const followedButton = (mediaId: string) => ({ content_type: "text" as const, title: "I followed ✅", payload: `GET:${mediaId}` });
+// Button titles are cut at 20 characters.
+const linkButton = (mediaId: string): Button => ({ type: "postback", title: "Send me the access", payload: `GET:${mediaId}` });
+const followButtons = (mediaId: string, username: string): Button[] => [
+  { type: "web_url", title: "Open profile", url: `https://www.instagram.com/${username}/` },
+  { type: "postback", title: "I followed ✅", payload: `GET:${mediaId}` },
+];
 
 type CommentValue = {
   id?: string;
@@ -25,7 +28,7 @@ type WebhookBody = {
   entry?: { id: string; changes?: { field: string; value: CommentValue }[]; messaging?: MessagingEvent[] }[];
 };
 
-/** Step 1: someone comments on a selected video -> one private-reply DM with a "Send me the link" button. */
+/** Step 1: someone comments on a selected video -> one private-reply DM with a "Send me the access" button. */
 async function onComment(account: Account, v: CommentValue) {
   const commentId = v.id ?? v.comment_id; // Meta's examples use either key depending on login type
   const mediaId = v.media?.id;
@@ -95,7 +98,7 @@ async function onMessage(account: Account, e: MessagingEvent) {
       console.error("Follow check failed, sending link anyway:", err);
     }
     if (!follows) {
-      await sendDM(account.igId, sender, rule.followText, [followedButton(mediaId)]);
+      await sendDM(account.igId, sender, rule.followText, followButtons(mediaId, account.username));
       await logEvent(mediaId, { at: Date.now(), igsid: sender, status: "follow_asked" });
       return console.log("Sent follow-first message");
     }

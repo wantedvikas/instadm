@@ -59,7 +59,7 @@ Built on the official **Meta Instagram Graph API** (webhooks plus private replie
 - **Trigger keywords.** `link, repo, code` matches whole words, case-insensitive. Leave it empty to reply to every comment.
 - **Two delivery modes:**
   - **Link in first DM:** the commenter gets your message and link in a single DM. This is the simplest and most reliable mode.
-  - **Followers only:** the commenter gets a DM with a **Send me the link** button. Tapping it checks whether they follow you. Followers get the link. Everyone else gets a "follow me first" message with an **I followed ✅** button that checks again.
+  - **Followers only:** the commenter gets a DM with a **Send me the access** button inside the message. Tapping it checks whether they follow you. Followers get the link. Everyone else gets a "follow me first" message with **Open profile** and **I followed ✅** buttons that checks again.
 - **Public reply under the comment** ("Sent you a DM 📩"), so people know to look in their inbox or Message requests. Write several and one is picked at random, so replies don't all look identical.
 - **Pause / Resume / Delete** from the list, without editing anything.
 - **Live DM preview**, a phone-style mock-up of exactly what commenters will receive, updated as you type.
@@ -91,7 +91,7 @@ Meta sends a "comments" webhook  ──►  /api/webhook (signature verified)
         │
         ├─ "Link in first DM"  →  private reply with your message + link
         │
-        └─ "Followers only"    →  private reply with a "Send me the link" button
+        └─ "Followers only"    →  private reply with a "Send me the access" button
                                       │  (commenter taps it → "messages" webhook)
                                       ▼
                                follows you? ── yes ─►  DM with the link
@@ -240,7 +240,7 @@ To confirm it never expires (optional): paste it into the Access Token Debugger.
 3. **Test it** from a second Instagram account: comment the keyword on that reel.
    - The DM arrives in their **Message requests** if they don't follow you; that's normal Instagram behaviour.
    - The commenter appears on the reel's page in the dashboard within a few seconds.
-   - You can watch the server logs in Vercel → **Logs**. Look for `Link sent directly`, `Private reply with button sent`, `Event: quick reply`, `Sent link message` and `Public reply posted`.
+   - You can watch the server logs in Vercel → **Logs**. Look for `Link sent directly`, `Private reply with button sent`, `Event: postback`, `Sent link message` and `Public reply posted`.
 
 ---
 

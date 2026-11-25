@@ -54,19 +54,23 @@ export async function listVideos(igId: string) {
   return out;
 }
 
-type QuickReply = { content_type: "text"; title: string; payload: string };
+/** Buttons drawn inside the message bubble (Instagram button template). Max 3, titles max 20 chars. */
+export type Button = { type: "postback"; title: string; payload: string } | { type: "web_url"; title: string; url: string };
 
 // igId is kept for logging/compat; the Page token sends as the Page-linked Instagram account.
-function sendMessage(_igId: string, recipient: object, text: string, quickReplies?: QuickReply[]) {
+function sendMessage(_igId: string, recipient: object, text: string, buttons?: Button[]) {
+  const message = buttons?.length
+    ? { attachment: { type: "template", payload: { template_type: "button", text: text.slice(0, 640), buttons } } }
+    : { text };
   return call("/me/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ recipient, message: quickReplies ? { text, quick_replies: quickReplies } : { text } }),
+    body: JSON.stringify({ recipient, message }),
   });
 }
 
-export const sendDM = (igId: string, igsid: string, text: string, quickReplies?: QuickReply[]) =>
-  sendMessage(igId, { id: igsid }, text, quickReplies);
+export const sendDM = (igId: string, igsid: string, text: string, buttons?: Button[]) =>
+  sendMessage(igId, { id: igsid }, text, buttons);
 
 /** Public reply under a comment (needs instagram_manage_comments). */
 export const replyToComment = (commentId: string, message: string) =>
@@ -76,7 +80,7 @@ export const sendPrivateText = (igId: string, commentId: string, text: string) =
   sendMessage(igId, { comment_id: commentId }, text);
 
 /** The one allowed DM in reply to a comment. Meta documents text only, so try with a button and fall back to plain text. */
-export async function sendPrivateReply(igId: string, commentId: string, text: string, button: QuickReply) {
+export async function sendPrivateReply(igId: string, commentId: string, text: string, button: Button) {
   try {
     await sendMessage(igId, { comment_id: commentId }, text, [button]);
   } catch (e) {
@@ -85,7 +89,7 @@ export async function sendPrivateReply(igId: string, commentId: string, text: st
   }
 }
 
-/** Needs the user to have messaged us first (tapping our quick reply counts). */
+/** Needs the user to have messaged us first (tapping our button counts). */
 export const followsMe = async (igsid: string) =>
   (await call<{ is_user_follow_business?: boolean }>(`/${igsid}?fields=is_user_follow_business`)).is_user_follow_business ===
   true;
