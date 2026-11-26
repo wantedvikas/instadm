@@ -71,7 +71,7 @@ export function RuleForm({ mediaId, rule, username }: { mediaId: string; rule: R
 
         <label>
           Public reply under the comment{" "}
-          <span className="hint">Posted after the DM so people know to check their inbox. One per line, picked at random. Leave empty to turn off.</span>
+          <span className="hint">Posted after the DM so people know to check their inbox. One per line, picked at random. {"{username}"} becomes their name. Leave empty to turn off.</span>
           <textarea name="publicReply" rows={3} defaultValue={rule.publicReply ?? ""} onChange={set("publicReply")} />
         </label>
 

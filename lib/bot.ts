@@ -65,7 +65,7 @@ async function onComment(account: Account, v: CommentValue) {
   }
 
   // Public "check your DMs" nudge, only after the DM went out. Rules saved before this feature get the default.
-  const reply = pickLine(rule.publicReply ?? DEFAULT_RULE.publicReply ?? "");
+  const reply = pickLine(rule.publicReply ?? DEFAULT_RULE.publicReply ?? "")?.replaceAll("{username}", v.from?.username ?? "there");
   if (!reply) return;
   try {
     await replyToComment(commentId, reply);
